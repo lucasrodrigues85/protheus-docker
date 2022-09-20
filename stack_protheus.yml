@@ -1,0 +1,85 @@
+version: '3.6'
+
+services:
+
+  db:
+    container_name: bd-postgres
+    image: postgres:12.3
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      TZ: 'America/Sao_Paulo'
+      POSTGRES_USER: 'docker'
+      POSTGRES_PASSWORD: 'docker'
+      APP_DB_USER: ${DB_USER}
+      APP_DB_PASS: ${DB_PASS}
+      APP_DB_NAME: ${DB_NAME}
+      POSTGRES_INITDB_ARGS: '--encoding=WIN1252 --lc-collate=C --lc-ctype=C'
+    volumes:
+      - ${DB_FOLDER}:/var/lib/postgresql/data/
+      - ${DB_SCRIPT}:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: [ 'CMD', 'pg_isready', '-q', '-d', 'postgres', '-U', 'docker' ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+
+  license:
+    container_name: licenseserver
+    image: lucascience/totvs-licenseserver-3.4.2
+    restart: on-failure
+    environment:
+      TZ: 'America/Sao_Paulo'
+      LD_LIBRARY_PATH: '/totvs/license/bin/appserver/:.'
+    working_dir: '/totvs/license/bin/appserver/'
+    command:
+      - ./appsrvlinux
+    ports:
+      - '2234:2234'
+      - '5555:5555'
+      - '8020:8020'
+    volumes:
+      - ${PATH_INI_LS}:/totvs/license/bin/appserver/appserver.ini
+
+  dbaccess:
+    container_name: dbaccess
+    image: lucascience/totvs-dbaccess-21.1.1.8
+    restart: on-failure
+    command:
+      - /totvs/dbaccess/dbaccess64
+    ports:
+      - '7890:7890'
+      - '7891:7891'
+    environment:
+      TZ: 'America/Sao_Paulo'
+      POSTGRES_HOST: 'db'
+      POSTGRES_PORT: 5432
+    volumes:
+      - ${PATH_INI_DBACCESS}:/totvs/dbaccess/dbaccess.ini
+      - ${PATH_INI_ODBC}:/etc/odbc.ini
+      - ${PATH_PROTHEUS_DATA}:/protheus_data
+    depends_on:
+      - db
+      - license
+
+  appserver:
+    container_name: appserver
+    image: lucascience/totvs-appserver-20.3.0.13
+    restart: on-failure
+    environment:
+      TZ: 'America/Sao_Paulo'
+      LD_LIBRARY_PATH: '/totvs/appserver/:.'
+    working_dir: '/totvs/appserver/'
+    command:
+      - ./appsrvlinux
+    ports:
+      - '6000:6000'
+      - '8000:8000'
+    volumes:
+      - ${PATH_INI_APPSERVER}:/totvs/appserver/appserver.ini
+      - ${PATH_APO}:/apo
+      - ${PATH_PROTHEUS_DATA}:/protheus_data
+    depends_on:
+      - license
+      - dbaccess
