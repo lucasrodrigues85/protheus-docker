@@ -1,6 +1,10 @@
 # protheus-docker
 Stack para criação de um ambiente Protheus em Linux com PostgreSQL para estudos/desenvolvimentos.
 
+Vídeo: <a href="https://youtu.be/KMpcaNdLOVI" target="_blank">https://youtu.be/KMpcaNdLOVI</a>
+
+Tempo total estimado para ambiente estar disponível: 20 minutos
+
 Pré requisitos: Docker previamente instalado.
 
 Como instalar Docker Desktop:
