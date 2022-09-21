@@ -1,5 +1,5 @@
 # protheus-docker
-Stack para criação de um ambiente Protheus em Linux com PostgreSQL para estudos/desenvolvimentos.
+Stack para criação de um ambiente Protheus em Linux com PostgreSQL para estudos/desenvolvimentos. IMPORTANTE: Este processo não é homologado pela TOTVS para ambientes de produção. Utilize-o apenas para estudos ou desenvolvimentos.
 
 Vídeo: <a href="https://youtu.be/KMpcaNdLOVI" target="_blank">https://youtu.be/KMpcaNdLOVI</a>
 
